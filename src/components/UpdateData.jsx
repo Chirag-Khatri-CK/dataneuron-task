@@ -126,7 +126,10 @@ const UpdateData = () => {
   }, [user?._id]);
 
   return (
-    <div className="flex items-center justify-center bg-indigo-100 p-20">
+    <div className="flex flex-col items-center justify-center bg-indigo-100 p-20">
+       <h3 className="text-indigo-800 text-2xl text-center font-semibold mb-8">
+        Task 2
+      </h3>
       <div className="flex flex-col items-center rounded-lg bg-indigo-200 justify-center w-3/4 lg:w-1/3 h-fit shadow-lg p-8">
         <table className="table-fixed bg-indigo-400 text-left w-full text-xl rounded-lg overflow-hidden">
           <thead>
@@ -147,8 +150,8 @@ const UpdateData = () => {
                 </td>
               </tr>
             ) : (
-              <tr className="">
-                <td className="bg-indigo-400 text-white p-2">
+              <tr>
+                <td className="bg-indigo-400 text-white p-2 text-center"  colspan="2">
                   Please add data
                 </td>
               </tr>
