@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import userServices from "../utils";
 
 const UpdateData = () => {
-  let user = JSON.parse(localStorage.getItem("user"));
+  let [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   let [tableData, setTableData] = useState({});
   let [modalInput, setModalInput] = useState({
     firstName: "",
@@ -41,6 +41,8 @@ const UpdateData = () => {
         .addTableData({ ...modalInput, ...{ userId: user._id } })
         .then((res) => {
           if (res?.data) {
+            console.log(user);
+            setUser({ ...user, addApiCount: user?.addApiCount + 1 });
             setTableData(res.data);
             setModalOpen(false);
           }
@@ -60,6 +62,7 @@ const UpdateData = () => {
         .updateTableData({ ...modalInput, ...{ userId: user._id } })
         .then((res) => {
           if (res?.data) {
+            setUser({ ...user, updateApiCount: user?.updateApiCount + 1 });
             setTableData(res.data);
             setModalOpen(false);
           }
@@ -70,12 +73,11 @@ const UpdateData = () => {
     }
   };
 
-
   //creating a new user
   const saveUser = () => {
     userServices
       .saveUser({
-        username: `data-neuron-${Math.floor(100000 + Math.random() * 900000)}`,
+        userName: `data-neuron-${Math.floor(100000 + Math.random() * 900000)}`,
       })
       .then((res) => {
         if (res?.data) {
@@ -101,16 +103,30 @@ const UpdateData = () => {
       });
   };
 
+  const getUserTableObj = (userId) => {
+    userServices
+      .getTableDataByUserId(userId)
+      .then((res) => {
+        if (res?.data) {
+          setTableData(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   useEffect(() => {
     if (user?._id) {
       getUser(user._id);
+      getUserTableObj(user._id);
     } else {
       saveUser();
     }
-  }, []);
+  }, [user?._id]);
 
   return (
-    <div className="w-screen h-screen flex items-center justify-center bg-indigo-100">
+    <div className="flex items-center justify-center bg-indigo-100 p-20">
       <div className="flex flex-col items-center rounded-lg bg-indigo-200 justify-center w-3/4 lg:w-1/3 h-fit shadow-lg p-8">
         <table className="table-fixed bg-indigo-400 text-left w-full text-xl rounded-lg overflow-hidden">
           <thead>
@@ -124,10 +140,10 @@ const UpdateData = () => {
             {Object.keys(tableData).length > 0 ? (
               <tr className="bg-indigo-200">
                 <td className="bg-indigo-400 text-white p-2">
-                  {tableData.firstName}
+                  {tableData?.firstName}
                 </td>
                 <td className="bg-indigo-400 text-white p-2">
-                  {tableData.lastName}
+                  {tableData?.lastName}
                 </td>
               </tr>
             ) : (
@@ -169,22 +185,25 @@ const UpdateData = () => {
       </div>
       {/* modal to add or update data  */}
       {isModalOpen && (
-        <div className="absolute flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md top-0 w-full h-full">
+        <div
+          className="fixed flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md top-0 w-full h-full"
+          onClick={() => setModalOpen(false)}
+        >
           <div className=" bg-indigo-200 w-1/2 h-fit p-8 rounded-lg">
             <input
               className="bg-[#F5F5F5] border-gray-border border-2 rounded-lg text-gray-dark font-medium p-2 w-full"
-              placeholder="Enter firstname"
+              placeholder="Enter Firstname"
               type="text"
               name="firstName"
-              defaultValue={modalInput.firstName}
+              defaultValue={modalInput?.firstName}
               onChange={handleChange}
             />
             <input
               className="bg-[#F5F5F5] border-gray-border border-2 rounded-lg text-gray-dark font-medium p-2 w-full my-6"
-              placeholder="Enter lastname"
+              placeholder="Enter Lastname"
               type="text"
               name="lastName"
-              defaultValue={modalInput.lastName}
+              defaultValue={modalInput?.lastName}
               onChange={handleChange}
             />
             <div>
